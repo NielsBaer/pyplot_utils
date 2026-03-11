@@ -5,6 +5,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
 "numpy",
+"netcdf4",
 "xarray",
 "matplotlib",
 "cartopy",
