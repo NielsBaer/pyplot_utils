@@ -67,10 +67,7 @@ def plot_cbar(ax, title, cmap, levs, location='bottom', mappable=None, **kwargs)
         orientation = 'horizontal'
     else:
         raise Exception("unknown location: "+location)
-    print(mappable)
     cbar = ColorbarBase(ax, cmap=cmap, orientation=orientation, ticklocation=location, values=levs, **kwargs)
-    print('title')
-    print(title)
     cbar.set_label(title, fontsize=10)
     # for some reason the cbar doesnt draw its tick on its own, but this works...
     # maybe investigate this/open an issue 
