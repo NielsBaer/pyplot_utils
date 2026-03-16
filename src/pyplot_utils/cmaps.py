@@ -1,6 +1,7 @@
 """Utilities for handeling colormaps and colorbars, so far largely for countourf plots"""
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+from matplotlib.colorbar import ColorbarBase
 from matplotlib.colors import LinearSegmentedColormap as LScmap
 from matplotlib.colors import ListedColormap as Lcmap
 import numpy as np
@@ -51,7 +52,7 @@ def get_div_cmap_w_levels(max_abs, n, cmap_neg=plt.cm.Blues, cmap_pos=plt.cm.Red
     return (cmap, levs)
 
 
-def plot_cbar(ax, title, cmap, levs, location='bottom', **kwargs):
+def plot_cbar(ax, title, cmap, levs, location='bottom', mappable=None, **kwargs):
     """plot a colorbar for contourf plot. The colorbar is independent of any actual plot, making it easy to use for multiple panels.
         Inputs:
         ax: axis for the colorbar
@@ -60,16 +61,20 @@ def plot_cbar(ax, title, cmap, levs, location='bottom', **kwargs):
         levs: levels of the colorbar. Assumes is that these are levels from a contourf plot, meaning they are the points of transition between colors
         orientation: orientation of the colorbar. Either 'horizontal' (default) or 'vertical'
     """
-    if location is 'left' or 'right':
+    if location == 'left' or location == 'right':
         orientation = 'vertical'
-    elif location is 'bottom' or 'top':
-        orientation = 'vertical'
+    elif location == 'bottom' or location == 'top':
+        orientation = 'horizontal'
     else:
         raise Exception("unknown location: "+location)
-    cbar = mpl.colorbar.ColorbarBase(ax, cmap=cmap, orientation=orientation, ticklocation=location, values=levs)
-    cbar.set_label(title)
-
-
+    print(mappable)
+    cbar = ColorbarBase(ax, cmap=cmap, orientation=orientation, ticklocation=location, values=levs, **kwargs)
+    print('title')
+    print(title)
+    cbar.set_label(title, fontsize=10)
+    # for some reason the cbar doesnt draw its tick on its own, but this works...
+    # maybe investigate this/open an issue 
+   
 def cbar_n_map(ax, max_abs, n, cmap_type='diverging', title='', location='bottom', cmap_neg=plt.cm.Blues, cmap_pos=plt.cm.Reds, round=None, auto_reduce_n=True, **cbar_kwargs):
     """plot a colorbar on given axis and return the corresponding colormap with levels.
         -------
@@ -112,7 +117,9 @@ def cbar_n_map(ax, max_abs, n, cmap_type='diverging', title='', location='bottom
     else:
         raise Exception("unknown cmap_type: "+cmap_type)
     cbar_levs = (clevels[:-1] + clevels[1:]) / 2
-    plot_cbar(ax, title, cmap, cbar_levs, location, **cbar_kwargs)
+    norm = mpl.colors.Normalize(vmin=-max_abs, vmax=max_abs)
+    mappable = mpl.cm.ScalarMappable(norm, cmap)
+    plot_cbar(ax, title, cmap, cbar_levs, location, norm=norm, **cbar_kwargs)
     return (cmap, clevels)
 
 
