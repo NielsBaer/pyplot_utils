@@ -61,7 +61,7 @@ def cont_cont_map(data:xr.DataArray, ax, cmap, clevels, stipple=None, stipple_de
     if stipple is not None:
         stip_dat, stip_lon = add_cyclic_point(stipple.to_numpy(), coord=stipple.lon)
         stip_lat = stipple.lat
-        ax.contourf(stip_lon, stip_lat, stip_dat, levels=[-0.5, 0.5, 1.5], colors='none', hatches=[stipple_dens*stipple_hatch], transform=ccrs.PlateCarree())
+        ax.contourf(stip_lon, stip_lat, stip_dat, levels=[0.5, 1.5], colors='none', hatches=[stipple_dens*stipple_hatch], transform=ccrs.PlateCarree())
     if mask is not None:
         mask_dat, mask_lon = add_cyclic_point(mask.to_numpy(), coord=mask.lon)
         mask_lat = mask.lat
