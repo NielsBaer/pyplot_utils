@@ -97,7 +97,7 @@ def get_lat_transform(projection=ccrs.EqualEarth()):
     return(to_map, from_map)
 
 
-def contf_n_cbar(data:xr.DataArray | list[xr.DataArray] , ax:mplax.Axes | list[mplax.Axes], cbar_ax: mplax.Axes, n:int, mabs:float|None=None cont_only:bool=False, cbar_kwargs:dict={}, contf_kwargs:dict={}, stipple:None|xr.DataArray|list[xr.DataArray|None]=None, mask:None|xr.DataArray|list[xr.DataArray|None]=None, type='contf'):
+def contf_n_cbar(data:xr.DataArray | list[xr.DataArray] , ax:mplax.Axes | list[mplax.Axes], cbar_ax: mplax.Axes, n:int, mabs:float|None=None, cont_only:bool=False, cbar_kwargs:dict={}, contf_kwargs:dict={}, stipple:None|xr.DataArray|list[xr.DataArray|None]=None, mask:None|xr.DataArray|list[xr.DataArray|None]=None, type='contf'):
     """plot a colorbar and contourf plots for multiple datasources showing the same variable.
         Inputs:
         data: data to plot. If this is a list, ax has to be a list of same length, and the contfs are plotted on the respective axes in ax.
