@@ -97,13 +97,14 @@ def get_lat_transform(projection=ccrs.EqualEarth()):
     return(to_map, from_map)
 
 
-def contf_n_cbar(data:xr.DataArray | list[xr.DataArray] , ax:mplax.Axes | list[mplax.Axes], cbar_ax: mplax.Axes, n:int, cont_only:bool=False, cbar_kwargs:dict={}, contf_kwargs:dict={}, stipple:None|xr.DataArray|list[xr.DataArray|None]=None, mask:None|xr.DataArray|list[xr.DataArray|None]=None, type='contf'):
+def contf_n_cbar(data:xr.DataArray | list[xr.DataArray] , ax:mplax.Axes | list[mplax.Axes], cbar_ax: mplax.Axes, n:int, mabs:float|None=None cont_only:bool=False, cbar_kwargs:dict={}, contf_kwargs:dict={}, stipple:None|xr.DataArray|list[xr.DataArray|None]=None, mask:None|xr.DataArray|list[xr.DataArray|None]=None, type='contf'):
     """plot a colorbar and contourf plots for multiple datasources showing the same variable.
         Inputs:
         data: data to plot. If this is a list, ax has to be a list of same length, and the contfs are plotted on the respective axes in ax.
         ax: axis/axes to plot the data on. If data contains multiple dataarrays, ax has to be a list with as many axes.
         cbar_ax: axis to plot the colorbar on
         n: number of levels for contourf plot. Note, that this turns into an upper limit if 'round' is passed in cbar_kwargs, and 'auto_reduce_n' is left True.
+        mabs: maximum absolute value to plot
         cbar_kwargs: keyword arguments to be passed to cmaps.cbar_n_map. Can be used to e.g. change the colormap generated.
         contf_kwargs: keyword arguments to be passed to the contf plotting function used. Can e.g. be used to change stipple density.
         stipple: dataarray(s) showing where to stipple (1 for stipple, 0 or Nan for rest). If this is a list, it has to have the same length as data. If it is a single dataarray it is applied to all plots.
@@ -139,10 +140,11 @@ def contf_n_cbar(data:xr.DataArray | list[xr.DataArray] , ax:mplax.Axes | list[m
     if len(mask_list) != num_da:
         raise Exception("number of masks given does not equal number of dataarrays!")
     # find maximum absolute value across datasets
-    mabs = np.float64(0)
-    for darray in data:
-        da_mabs = np.nanmax(np.abs(darray))
-        mabs = np.nanmax([mabs, da_mabs])
+    if mabs is None:
+        mabs = np.float64(0)
+        for darray in data:
+            da_mabs = np.nanmax(np.abs(darray))
+            mabs = np.nanmax([mabs, da_mabs])
     cmap, clevels = cbar_n_map(ax=cbar_ax, max_abs=mabs, n=n, **cbar_kwargs)
     for darray, stip_da, mask_da, axis in zip(data, stip_list, mask_list, ax):
         if type == 'contf':
