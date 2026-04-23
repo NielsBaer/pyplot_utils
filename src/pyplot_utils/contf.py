@@ -43,7 +43,7 @@ def plot_contf(data:xr.DataArray, x, y, ax, cmap, clevels, stipple=None, stipple
         ax.contourf(mask_x, mask_y, mask_data, levels=[0.5, 1.5], colors=mask_color)
 
 
-def zonal_contf(data:xr.DataArray, ax, cmap, clevels, y=None, stipple=None, stipple_dens=4, stipple_hatch='.', mask=None, mask_color='lightgray', reduce_lat=False):
+def zonal_contf(data:xr.DataArray, ax, cmap, clevels, y=None, stipple=None, stipple_dens=4, stipple_hatch='.', mask=None, mask_color='lightgray', reduce_lat=False, colormesh=False):
     """plots a contourf plot on continets only.
         -------
         Inputs:
@@ -68,7 +68,10 @@ def zonal_contf(data:xr.DataArray, ax, cmap, clevels, y=None, stipple=None, stip
     plot_data = data.to_numpy()
     plot_lat = data.lat
     plot_y = data[y]
-    ax.contourf(plot_lat, plot_y, plot_data, levels=clevels, cmap=cmap)
+    if colormesh:
+        ax.pcolormesh(plot_lat, plot_y, plot_data, levels=clevels, cmap=cmap)
+    else:
+        ax.contourf(plot_lat, plot_y, plot_data, levels=clevels, cmap=cmap)
 
     if reduce_lat:
         ax.set_xlim([-50, 90])
