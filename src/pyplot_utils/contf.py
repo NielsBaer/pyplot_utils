@@ -6,7 +6,7 @@ import numpy as np
 from .cmaps import cbar_n_map
 from cartopy.util import add_cyclic_point
 
-def plot_contf(data:xr.DataArray, x, y, ax, cmap, clevels, stipple=None, stipple_dens=4, stipple_hatch='.', mask=None, mask_color='lightgray'):
+def plot_contf(data:xr.DataArray, x, y, ax, cmap, clevels, stipple=None, stipple_dens=4, stipple_hatch='.', mask=None, mask_color='lightgray', colormesh=False):
     """plots a contourf plot on ax.
         -------
         Inputs:
@@ -26,7 +26,10 @@ def plot_contf(data:xr.DataArray, x, y, ax, cmap, clevels, stipple=None, stipple
     plot_data = data.to_numpy()
     plot_x = data[x]
     plot_y = data[y]
-    ax.contourf(plot_x, plot_y, plot_data, levels=clevels, cmap=cmap)
+    if colormesh:
+        ax.pcolormesh(plot_x, plot_y, plot_data, levels=clevels, cmap=cmap)
+    else:
+        ax.contourf(plot_x, plot_y, plot_data, levels=clevels, cmap=cmap)
     # mask and stipple if given arguments
     if stipple is not None:
         stip_data = stipple.to_numpy()
