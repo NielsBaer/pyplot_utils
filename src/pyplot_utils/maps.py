@@ -124,13 +124,35 @@ def map_n_cbar(data:xr.DataArray | list[xr.DataArray] , ax:mplax.Axes | list[mpl
         mask_list = mask
     if len(mask_list) != num_da:
         raise Exception("number of masks given does not equal number of dataarrays!")
-    # find maximum absolute value across datasets
+    # find max and min value across datasets
+    data_max = np.float64(0)
+    data_min = np.float64(0)
+    for darray in data:
+        da_max = np.nanmax(darray)
+        da_min = np.nanmin(darray)
+        data_max = np.nanmax([data_max, da_max])
+        data_min = np.nanmin([data_min, da_min])
+    # if no maximum absolute value is given, calculate it from the data
     if mabs is None:
-        mabs = np.float64(0)
-        for darray in data:
-            da_mabs = np.nanmax(np.abs(darray))
-            mabs = np.nanmax([mabs, da_mabs])
+        mabs=np.nanmax([data_max, -data_min])
+        cbar_kwargs['extend']='neither'
+    # otherwise check if the data is outside +- mabs and extend cbar
+    elif data_max > mabs:
+        if -data_min > mabs:
+            cbar_kwargs['extend']='both'
+        else:
+            cbar_kwargs['extend']='max'
+    else:
+        if -data_min > mabs:
+            cbar_kwargs['extend']='min'
+        else:
+            cbar_kwargs['extend']='neither'
     cmap, clevels = cbar_n_map(ax=cbar_ax, max_abs=mabs, n=n, **cbar_kwargs)
+    # if cbar is extended, also update clevels, so that the corresponding points are not white
+    if cbar_kwargs['extend'] in ['both', 'max']:
+        clevels[-1]=np.inf
+    if cbar_kwargs['extend'] in ['both', 'min']:
+        clevels[0]=-np.inf
     for darray, stip_da, mask_da, axis in zip(data, stip_list, mask_list, ax):
         if cont_only:
             cont_cont_map(data=darray, ax=axis, cmap=cmap, clevels=clevels, stipple=stip_da, **map_kwargs)
