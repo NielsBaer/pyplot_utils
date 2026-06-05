@@ -83,7 +83,7 @@ def get_lat_transform(projection=ccrs.EqualEarth()):
     return(to_map, from_map)
 
 
-def map_n_cbar(data:xr.DataArray | list[xr.DataArray] , ax:mplax.Axes | list[mplax.Axes], cbar_ax: mplax.Axes, n:int, cont_only:bool=False, cbar_kwargs:dict={}, map_kwargs:dict={}, stipple:None|xr.DataArray|list[xr.DataArray|None]=None, mask:None|xr.DataArray|list[xr.DataArray|None]=None):
+def map_n_cbar(data:xr.DataArray | list[xr.DataArray] , ax:mplax.Axes | list[mplax.Axes], cbar_ax: mplax.Axes, n:int, mabs:float|None=None, cont_only:bool=False, cbar_kwargs:dict={}, map_kwargs:dict={}, stipple:None|xr.DataArray|list[xr.DataArray|None]=None, mask:None|xr.DataArray|list[xr.DataArray|None]=None):
     """plot a colorbar and maps for multiple datasources showing the same variable.
         Inputs:
         data: data to plot. If this is a list, ax has to be a list of same length, and the maps are plotted on the respective axes in ax.
@@ -125,10 +125,11 @@ def map_n_cbar(data:xr.DataArray | list[xr.DataArray] , ax:mplax.Axes | list[mpl
     if len(mask_list) != num_da:
         raise Exception("number of masks given does not equal number of dataarrays!")
     # find maximum absolute value across datasets
-    mabs = np.float64(0)
-    for darray in data:
-        da_mabs = np.nanmax(np.abs(darray))
-        mabs = np.nanmax([mabs, da_mabs])
+    if mabs is None:
+        mabs = np.float64(0)
+        for darray in data:
+            da_mabs = np.nanmax(np.abs(darray))
+            mabs = np.nanmax([mabs, da_mabs])
     cmap, clevels = cbar_n_map(ax=cbar_ax, max_abs=mabs, n=n, **cbar_kwargs)
     for darray, stip_da, mask_da, axis in zip(data, stip_list, mask_list, ax):
         if cont_only:
