@@ -22,7 +22,10 @@ def glob_cont_map(data:xr.DataArray, ax, cmap, clevels, stipple=None, stipple_de
     """
     map_data, lon = add_cyclic_point(data.to_numpy(), coord=data.lon)
     lat = data.lat
-    ax.contourf(lon, lat, map_data, levels=clevels, cmap=cmap, transform=ccrs.PlateCarree())
+    # use cmap.colors, rather than cmap directly, so that uneven level spacing works
+    ax.contourf(lon, lat, map_data, levels=clevels, colors=cmap.colors, transform=ccrs.PlateCarree())
+    ax.coastlines()
+
     ax.coastlines()
     # mask and stipple if given arguments
     if stipple is not None:
@@ -149,10 +152,12 @@ def map_n_cbar(data:xr.DataArray | list[xr.DataArray] , ax:mplax.Axes | list[mpl
             cbar_kwargs['extend']='neither'
     cmap, clevels = cbar_n_map(ax=cbar_ax, max_abs=mabs, n=n, **cbar_kwargs)
     # if cbar is extended, also update clevels, so that the corresponding points are not white
+    print(clevels)
     if cbar_kwargs['extend'] in ['both', 'max']:
         clevels[-1]=data_max
     if cbar_kwargs['extend'] in ['both', 'min']:
         clevels[0]=data_min
+    print(clevels)
     for darray, stip_da, mask_da, axis in zip(data, stip_list, mask_list, ax):
         if cont_only:
             cont_cont_map(data=darray, ax=axis, cmap=cmap, clevels=clevels, stipple=stip_da, **map_kwargs)
