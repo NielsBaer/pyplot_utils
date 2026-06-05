@@ -150,9 +150,9 @@ def map_n_cbar(data:xr.DataArray | list[xr.DataArray] , ax:mplax.Axes | list[mpl
     cmap, clevels = cbar_n_map(ax=cbar_ax, max_abs=mabs, n=n, **cbar_kwargs)
     # if cbar is extended, also update clevels, so that the corresponding points are not white
     if cbar_kwargs['extend'] in ['both', 'max']:
-        clevels[-1]=np.inf
+        clevels[-1]=data_max
     if cbar_kwargs['extend'] in ['both', 'min']:
-        clevels[0]=-np.inf
+        clevels[0]=data_min
     for darray, stip_da, mask_da, axis in zip(data, stip_list, mask_list, ax):
         if cont_only:
             cont_cont_map(data=darray, ax=axis, cmap=cmap, clevels=clevels, stipple=stip_da, **map_kwargs)
