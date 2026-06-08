@@ -53,7 +53,7 @@ def cont_cont_map(data:xr.DataArray, ax, cmap, clevels, stipple=None, stipple_de
     """
     map_data, lon = add_cyclic_point(data.to_numpy(), coord=data.lon)
     lat = data.lat
-    ax.contourf(lon, lat, map_data, levels=clevels, cmap=cmap, transform=ccrs.PlateCarree())
+    ax.contourf(lon, lat, map_data, levels=clevels, colors=cmap.colors, transform=ccrs.PlateCarree())
     ax.axis('off')
     ax.set_global()
     if reduce_lon:
